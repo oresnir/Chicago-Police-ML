@@ -34,7 +34,7 @@ def clean_data(data):  # receives X m*d
     # delete nall values
     data = data.dropna()
 
-    #delete outliers
+    #delete outliers TODO CHECK
     z_score = sp.zscore(data)
     abs_z_score = np.abs(z_score)
     filter_entire = (abs_z_score < 3).all(axis=1)
@@ -43,10 +43,13 @@ def clean_data(data):  # receives X m*d
     # delete irrelevant fetcher
     data = data.drop('Unnamed: 0', axis=1)
     data = data.drop('ID', axis=1)
+    data = data.drop('Year', axis=1)
     data = data.drop('Location', axis=1)
     data = data.drop('Case Number', axis=1)
-    data = data.drop('Description', axis=1)
+    data = data.drop('Location Description', axis=1)
     data = data.drop('Block', axis=1)
+
+    data = data.drop('Description', axis=1)
     data = data.drop('IUCR', axis=1)
     data = data.drop('FBI Code', axis=1)
     # data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y %H:%M:%S %p', errors='coerce')
@@ -60,8 +63,9 @@ if __name__ == '__main__':
     full_data = pd.read_csv("dataset_crimes.csv")
     train, validate, test = split_data(full_data)
     print(train)
-    train = clean_data(train)
-    print(train)
+    print(len(full_data['Location Description'].unique()))
+    # train = clean_data(train)
+    # print(train)
 
 
 
