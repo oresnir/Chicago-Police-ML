@@ -45,6 +45,8 @@ def split_data():
     X_train, X_val, y_train, y_val = train_test_split(
         X_trainval, y_trainval, test_size=0.2, random_state=42)
 
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
 
 def clean_data(data):  # receives X m*d
     data = data.dropna()
