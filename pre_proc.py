@@ -7,24 +7,6 @@ from sklearn.model_selection import train_test_split
 
 df = pd.read_csv('../Chicago-Police-ML/Dataset_crimes.csv', sep=",")
 
-# Drop nan values
-df = df.dropna()
-
-# Drop column Unnamed
-df = df.drop('Unnamed: 0', axis=1)
-df.head()
-
-# Convert Date column to Date Time format
-df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %H:%M:%S %p', errors='coerce')
-
-# Eliminate duplicate rows
-df = df.drop_duplicates()
-
-# Visualization of the Longitude and Latitude.
-plt.scatter('Longitude', 'Latitude', c='gray', data=df, s=20)
-
-plt.show();
-
 labels = {0: 'BATTERY', 1: 'THEFT', 2: 'CRIMINAL DAMAGE',
           3: 'DECEPTIVE RACTICE', 4: 'ASSAULT'}
 
@@ -63,6 +45,25 @@ def clean_data(data):  # receives X m*d
     # data = data.drop('FBI Code', axis=1)
 
     # print(data)
+
+    # Drop nan values
+    df = df.dropna()
+
+    # Drop column Unnamed
+    df = df.drop('Unnamed: 0', axis=1)
+    df.head()
+
+    # Convert Date column to Date Time format
+    df['Date'] = pd.to_datetime(df['Date'], format='%m/%d/%Y %H:%M:%S %p', errors='coerce')
+
+    # Eliminate duplicate rows
+    df = df.drop_duplicates()
+
+    # Visualization of the Longitude and Latitude.
+    plt.scatter('Longitude', 'Latitude', c='gray', data=df, s=20)
+
+    plt.show()
+
     return data
 
 
