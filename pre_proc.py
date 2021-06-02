@@ -62,7 +62,8 @@ def clean_data(data):  # receives X m*d
     # data = data.drop('IUCR', axis=1)
     # data = data.drop('FBI Code', axis=1)
 
-    print(data)
+    # print(data)
+    return data
 
 
 if __name__ == '__main__':
