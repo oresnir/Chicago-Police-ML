@@ -11,13 +11,13 @@ labels = {0: 'BATTERY', 1: 'THEFT', 2: 'CRIMINAL DAMAGE',
           3: 'DECEPTIVE RACTICE', 4: 'ASSAULT'}
 
 
-def split_data():
+def split_data(data):
     # Split Data Train/ Validate/Test
     target = 'Arrest'  # our labels
-    features = df.columns.drop([target, 'ID'])
+    features = data.columns.drop([target, 'ID'])
 
-    X = df[features]
-    y = df[target]
+    X = data[features]
+    y = data[target]
 
     # split to train and test data
     X_trainval, X_test, y_trainval, y_test = train_test_split(
@@ -69,8 +69,8 @@ def clean_data(data):  # receives X m*d
 
 if __name__ == '__main__':
     full_data = pd.read_csv("dataset_crimes.csv")
+    X_train, y_train, X_val, y_val, X_test, y_test = split_data(full_data)
     msk = np.random.rand(len(full_data)) < 0.75
-
     train = full_data[msk]
     test = full_data[~msk]
     print(train)
