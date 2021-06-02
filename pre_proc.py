@@ -31,14 +31,14 @@ def split_x_y(data):
 
 
 def clean_data(data):  # receives X m*d
-    # delete nall values
+    # delete null values
     data = data.dropna()
 
     #delete outliers TODO CHECK
-    z_score = sp.zscore(data)
-    abs_z_score = np.abs(z_score)
-    filter_entire = (abs_z_score < 3).all(axis=1)
-    data = data[filter_entire]
+    # z_score = sp.zscore(data)
+    # abs_z_score = np.abs(z_score)
+    # filter_entire = (abs_z_score < 3).all(axis=1)
+    # data = data[filter_entire]
 
     # delete irrelevant fetcher
     data = data.drop('Unnamed: 0', axis=1)
@@ -52,6 +52,9 @@ def clean_data(data):  # receives X m*d
     data = data.drop('Description', axis=1)
     data = data.drop('IUCR', axis=1)
     data = data.drop('FBI Code', axis=1)
+    data['Arrest'] = data['Arrest'].astype(int)
+    data['Domestic'] = data['Domestic'].astype(int)
+
     # data['Date'] = pd.to_datetime(data['Date'], format='%m/%d/%Y %H:%M:%S %p', errors='coerce')
     data = data.drop_duplicates()
 
@@ -62,9 +65,11 @@ def clean_data(data):  # receives X m*d
 if __name__ == '__main__':
     full_data = pd.read_csv("dataset_crimes.csv")
     train, validate, test = split_data(full_data)
-    # print(len(full_data['Beat'].unique()))
-    # train = clean_data(train)
+    # print(train.dtypes)
+    train = clean_data(train)
     print(train.dtypes)
+
+
 
 
 
