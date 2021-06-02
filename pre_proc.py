@@ -14,7 +14,7 @@ df = pd.read_csv('../Chicago-Police-ML/Dataset_crimes.csv', sep=",")
 # plt.show()
 
 labels = {0: 'BATTERY', 1: 'THEFT', 2: 'CRIMINAL DAMAGE',
-          3: 'DECEPTIVE RACTICE', 4: 'ASSAULT'}
+          3: 'DECEPTIVE PRACTICE', 4: 'ASSAULT'}
 
 
 def split_data(data):
