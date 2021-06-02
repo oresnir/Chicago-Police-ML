@@ -62,10 +62,9 @@ def clean_data(data):  # receives X m*d
 if __name__ == '__main__':
     full_data = pd.read_csv("dataset_crimes.csv")
     train, validate, test = split_data(full_data)
-    print(train)
-    print(len(full_data['Location Description'].unique()))
+    # print(len(full_data['Beat'].unique()))
     # train = clean_data(train)
-    # print(train)
+    print(train.dtypes)
 
 
 
