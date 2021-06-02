@@ -76,10 +76,3 @@ if __name__ == '__main__':
     clean_data(train)
 
 
-# TODO: ORE TO RON& EVYA:  WHAT IS THIS?
-sns.set(style='ticks', context='talk')
-sns.swarmplot(x='Domestic', y='Primary Type', data=test)
-sns.despine()
-print(train.describe())
-plt.matshow(test)
-plt.show()
