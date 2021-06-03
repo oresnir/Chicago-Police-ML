@@ -52,14 +52,18 @@ def clean_data(data):  # receives X m*d
     data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
     data = data.dropna()
     data['date2'] = pd.to_datetime(data['Date'])
-    data['Hour'] = data['date2'].dt.hour
-    data['Month'] = data['date2'].dt.month
-    # data['Minute'] = data['date2'].dt.minute
+    # print(data['date2'])
+    data['Hour'] = data['date2'].dt.hour.astype(int)
+    # data['Month'] = data['date2'].dt.month
+    data['Minute'] = data['date2'].dt.minute.astype(int)
+    # print(data['Hour'], data['Minute'])
 
     data['day_of_week'] = data['date2'].dt.day_name()
     c = pd.Categorical(data['day_of_week'])
     data['day_of_week'] = c.rename_categories(week_days)
 
+    # data['Date'] = dt.datetime.strptime(data['Date'][0], "%H:%M")
+    # print("this is 0: ", data['Date'][0])
     data = data.drop('date2', axis=1)
 
     data['Date'] = pd.to_datetime(data['Date'])
@@ -140,14 +144,39 @@ if __name__ == '__main__':
 
     # points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), X)
 
-    X = X.drop('Date', axis=1)
+    # X = X.drop('Date', axis=1)
     X = X.dropna()
-    print(X.dtypes)
+    # print(X.dtypes)
 
-    train_hour = X[['X Coordinate', 'Y Coordinate', 'Hour']]
+    print(X[:,70])
+
+    train_hour = X[['X Coordinate', 'Y Coordinate']]
+    ts = []
+    for i in range(X.shape[0]):
+        h = X['Date'][i].hour
+        m = X['Date'][i].minute
+        t = dt.time(h, m)
+        ts.append(t)
+
+    train_hour['Time'] = ts
+    train_hour = train_hour.reindex(range(train_hour.shape[0]))
     hour_cluster = Cluster(train_hour, 'hour')
     hour_cluster.create_h()
     hour_cluster.plot_centers()
+
+    # X['Hour'] = X['Hour'].astype(int)
+    # X['Minute'] = X['Minute'].astype(int)
+    # for i in range(X.shape[0]):
+    #     h = X['Hour'][i]
+    #     m = X['Minute'][i]
+    #     # t.append(dt.time(h, m))
+    #     print(h,m)
+
+
+    # train_hour = X[['X Coordinate', 'Y Coordinate', 'Hour']]
+    # hour_cluster = Cluster(train_hour, 'hour')
+    # hour_cluster.create_h()
+    # hour_cluster.plot_centers()
 
     for key, value in week_days.items():
         train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week']]
