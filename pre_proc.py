@@ -125,7 +125,7 @@ if __name__ == '__main__':
     # a = svm_predictions_labels - resampled_training_outputs_labels
     # print(a.shape[0])
     # print(np.count_nonzero(a))
-    clf = DecisionTreeClassifier(max_depth=50)
+    clf = DecisionTreeClassifier(max_depth=20)
 
     # Train Decision Tree Classifer
     clf = clf.fit(resampled_training_inputs, resampled_training_outputs_labels)
@@ -134,8 +134,14 @@ if __name__ == '__main__':
     # y_pred = clf.predict(resampled_training_inputs)
     print(clf.score(resampled_training_inputs, resampled_training_outputs_labels))
 
-    data_validation = pd.read_csv("train.csv")
+    data_validation = pd.read_csv("validate.csv")
 
     data_validation = clean_data(data_validation)
     X_valid, y_valid = split_x_y(data_validation)
     print(clf.score(X_valid, y_valid))
+
+    # data_validation = pd.read_csv("train.csv")
+    #
+    # data_validation = clean_data(data_validation)
+    # X_valid, y_valid = split_x_y(data_validation)
+    # print(clf.score(X_valid, y_valid))
