@@ -138,21 +138,33 @@ def master_clusters(day):
 
 if __name__ == '__main__':
     data = pd.read_csv("train.csv")
-    X, y = split_x_y(clean_data(data))
+    data = clean_data(data)
+    X, y = split_x_y(data)
     X = X.reindex(range(X.shape[0]))
     y = y.reindex(range(X.shape[0]))
+    X = X.dropna()
+
+    points = dt.datetime(2021, 1, 7, 11, 30, 0)
+    print(points)
+    points2 = dt.time(11, 30)
+    print(points2)
 
     # points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), X)
-
     # X = X.drop('Date', axis=1)
-    X = X.dropna()
     # print(X.dtypes)
-
-    print(X[:,70])
-
+    # data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+    # data = data.dropna(subset=['Date'])
+    # X = X.reindex(range(X.shape[0]))
+    # print(X)
+    # X = X.drop(X[70], axis=0)
+    # y = y.reindex(range(X.shape[0]))
+    # X['Hour'] = X['Hour'].astype(int)
+    # X['Minute'] = X['Minute'].astype(int)
     train_hour = X[['X Coordinate', 'Y Coordinate']]
     ts = []
+
     for i in range(X.shape[0]):
+        print(i)
         h = X['Date'][i].hour
         m = X['Date'][i].minute
         t = dt.time(h, m)
@@ -171,7 +183,6 @@ if __name__ == '__main__':
     #     m = X['Minute'][i]
     #     # t.append(dt.time(h, m))
     #     print(h,m)
-
 
     # train_hour = X[['X Coordinate', 'Y Coordinate', 'Hour']]
     # hour_cluster = Cluster(train_hour, 'hour')
@@ -197,5 +208,3 @@ if __name__ == '__main__':
     #     month_cluster.plot_centers()
 
     master_clusters("Monday")
-
-
