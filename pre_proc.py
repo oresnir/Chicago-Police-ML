@@ -76,7 +76,7 @@ def clean_data(data):  # receives X m*d
     data['Hour'] = data['date2'].dt.hour
     data['Minute'] = data['date2'].dt.minute
     # data['Second'] = data['date2'].dt.second
-    data = data.drop(['Date'], axis=1)  # TODO return this
+    data = data.drop(['Date'], axis=1)
     # data['Date'] = pd.to_datetime(data['Date'])
 
     data = data.drop(['date2'], axis=1)
@@ -102,9 +102,6 @@ def clean_data(data):  # receives X m*d
     # print("this is vec[70]",vec[70])
     # data['Weekday'] = vec
     # changes string labels to ints
-    # data['Date'] = pd.to_datetime(data.Date)
-    # data['Weekday'] = data.Date.dt.weekday
-    # data.Weekday += 1
     c = pd.Categorical(data[TARGET])
     data[TARGET] = c.rename_categories(labels)
 
@@ -133,12 +130,9 @@ if __name__ == '__main__':
     # print("CRIMINAL DAMAGE", y_train(2).count())
     # print("DECEPTIVE PRACTICE", y_train(3).count())
     # print("ASSAULT", y_train(4).count())
-    print(X_train.shape)
-    print(y_train.shape)
+
     sm = SMOTE()
     resampled_training_inputs, resampled_training_outputs_labels = sm.fit_resample(X_train, y_train)
-    print(resampled_training_inputs.shape)
-    print(resampled_training_outputs_labels.shape)
     # print(resampled_training_outputs_labels.value_counts())
     # print("X:", resampled_training_outputs_labels.shape)
     # print("y:", resampled_training_outputs_labels.shape)
