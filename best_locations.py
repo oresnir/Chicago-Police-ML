@@ -16,7 +16,8 @@ week_days = {"Monday": 0, "Tuesday": 1, "Wednesday": 2, "Thursday": 3,
 labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
           'DECEPTIVE PRACTICE': 3, 'ASSAULT': 4}
 
-cluster_dict = {}
+days_dict = {}
+month_dict = {}
 
 
 def split_x_y(data):
@@ -52,7 +53,8 @@ def clean_data(data):  # receives X m*d
     data = data.dropna()
     data['date2'] = pd.to_datetime(data['Date'])
     data['Hour'] = data['date2'].dt.hour
-    data['Minute'] = data['date2'].dt.minute
+    data['Month'] = data['date2'].dt.month
+    # data['Minute'] = data['date2'].dt.minute
 
     data['day_of_week'] = data['date2'].dt.day_name()
     c = pd.Categorical(data['day_of_week'])
@@ -117,6 +119,18 @@ class Cluster:
         plt.show()
 
 
+# day = string(Sunday-Monday) , month = int (1-12)
+def master_clusters(day):
+    hour_centers = np.array(hour_cluster.centers)
+    day_centers = np.array(days_dict[day].centers)
+    frames = [hour_centers, day_centers, day_centers]
+    result = pd.concat(frames)
+    print(result)
+    final_cluster = Cluster(result, 'final')
+    final_cluster.create_h()
+    return final_cluster.centers
+
+
 if __name__ == '__main__':
     data = pd.read_csv("train.csv")
     X, y = split_x_y(clean_data(data))
@@ -134,14 +148,24 @@ if __name__ == '__main__':
     hour_cluster.create_h()
     hour_cluster.plot_centers()
 
-    train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week']]
     for key, value in week_days.items():
-        #
-        # rslt_df = dataframe[dataframe['Percentage'] > 80]
-
+        train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week']]
         train_day_of_week = train_day_of_week[train_day_of_week['day_of_week'] == value]
-        print(train_day_of_week)
+        print("the day: ", key, train_day_of_week)
         week_cluster = Cluster(train_day_of_week, key)
-        cluster_dict[key] = week_cluster
+        days_dict[key] = week_cluster
         week_cluster.create_h()
         week_cluster.plot_centers()
+
+    # for month in range(1, 13):
+    #     train_month = X[['X Coordinate', 'Y Coordinate', 'Month']]
+    #     train_month = train_month[train_month['Month'] == month]
+    #     print("the month: ", month, train_month)
+    #     month_cluster = Cluster(train_month, month)
+    #     month_dict[month] = month_cluster
+    #     month_cluster.create_h()
+    #     month_cluster.plot_centers()
+
+    master_clusters("Monday")
+
+
