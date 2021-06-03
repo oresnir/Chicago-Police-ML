@@ -13,7 +13,7 @@ labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
 
 
 def split_x_y(data):
-    y = data['Date']
+    y = data['Hour']
 
     return data, y
 
@@ -43,6 +43,10 @@ def clean_data(data):  # receives X m*d
 
     data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
     data = data.dropna()
+    data['date2'] = pd.to_datetime(data['Date'])
+    data['Hour'] = data['date2'].dt.hour
+    data['Minute'] = data['date2'].dt.minute
+    data = data.drop('date2', axis=1)
 
     data['Date'] = pd.to_datetime(data['Date'])
 
@@ -81,11 +85,35 @@ if __name__ == '__main__':
     points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), X)
     print(points)
     # Creating figure
+
+
+
+    print(X)
+    print()
+    print(y)
+
+    X = X.drop('Date', axis=1)
+    X = X.dropna()
+    print(X.dtypes)
+    new_x = X[['X Coordinate', 'Y Coordinate', 'Hour']]
+    kmeans = KMeans(
+        init="random",
+        n_clusters=30,
+        n_init=10,
+        max_iter=300,
+        random_state=42)
+    kmeans.fit(new_x)
+    print(kmeans.labels_)
+    for i in range(len(kmeans.labels_)):
+        if kmeans.labels_[i] == 12:
+            print(new_x['Hour'][i])
+    # print(kmeans.get_params())
+    # print(kmeans.score(new_x, y))
     fig = plt.figure(figsize=(20, 13))
     ax = plt.axes(projection="3d")
 
     # Creating plot
-    ax.scatter(X['X Coordinate'], X['Y Coordinate'], c=y, cmap='rainbow')
+    ax.scatter(new_x['X Coordinate'], new_x['Y Coordinate'], c=new_x['Hour'], cmap='rainbow')
     plt.gray()
     # plt.title("simple 3D scatter plot")
 
@@ -93,19 +121,3 @@ if __name__ == '__main__':
     # plt.figure()
     # plt.scatter3d([get_dist(X['X Coordinate'][i], X['Y Coordinate'][i]) for i in range(X.shape[0])], range(X.shape[0]))
     plt.show()
-
-    #
-    print(X)
-    print()
-    print(y)
-    X = X.drop('Date', axis=1)
-    X = X.dropna()
-    kmeans = KMeans(
-        init="random",
-        n_clusters=30,
-        n_init=10,
-        max_iter=300,
-        random_state=42)
-    kmeans.fit(X)
-    print(kmeans.get_params())
-    print(kmeans.score(X, y))
