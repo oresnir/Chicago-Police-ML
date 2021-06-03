@@ -74,7 +74,7 @@ def clean_data(data):  # receives X m*d
     # data = data.drop(['date2'], axis=1)
     data = data.drop(['Updated On'], axis=1)
     data['day_of_week'] = data['date2'].dt.day_name()
-    data['day_of_week'].ge
+    data = pd.get_dummies(data,columns=['day_of_week'])
 
     data = data.drop_duplicates()
     # changes string labels to ints
@@ -106,7 +106,6 @@ if __name__ == '__main__':
     print(data['Beat'])
     data = clean_data(data)
     print(data['date2'])
-    print(data['day_of_week'])
 
 
 
