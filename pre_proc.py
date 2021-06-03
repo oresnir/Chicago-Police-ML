@@ -13,11 +13,15 @@ from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import SMOTE
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+import calendar
+
 
 # df = pd.read_csv('../Chicago-Police-ML/Dataset_crimes.csv', sep=",")
 # Visualization of the Longitude and Latitude.
 # plt.scatter('Longitude', 'Latitude', c='gray', data=df, s=20)
 # plt.show()
+
+week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 TARGET = 'Primary Type'
 labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
@@ -50,13 +54,13 @@ def clean_data(data):  # receives X m*d
     data = data.drop('ID', axis=1)
     data = data.drop('Year', axis=1)
     data['Location'] = pd.factorize(data["Location"])[0]
-    # data = data.drop('Location', axis=1)
     data = data.drop('Case Number', axis=1)
     data['Location Description'] = pd.factorize(data["Location Description"])[0]
     data['Block'] = pd.factorize(data["Block"])[0]
-    # data = data.drop('Location Description', axis=1)
-    # data = data.drop('Block', axis=1)
+
     data = data.drop('Updated On', axis=1)
+    data['day_of_week'] = data['date2'].dt.day_name()
+    data = pd.get_dummies(data, columns=['day_of_week'])
 
     data = data.drop('Description', axis=1)
     data = data.drop('IUCR', axis=1)
@@ -77,37 +81,14 @@ def clean_data(data):  # receives X m*d
     data['Minute'] = data['date2'].dt.minute
     # data['Second'] = data['date2'].dt.second
     data = data.drop(['Date'], axis=1)
-    # data['Date'] = pd.to_datetime(data['Date'])
 
     data = data.drop(['date2'], axis=1)
 
-    # data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
-    # data['Monday'] = (data["Date"].index.get_level_values(0).weekday == 0).astype(int)
-    # print("before: ",data.shape[0])
-    # data = data.dropna()
-    # print("after: ", data.shape[0])
-    # print(pd.get_dummies(data['Date'].dt.weekday()))
-    # data['Date'] = data['Date'].dt.weekday()
-    # print("the day of the week:", data['Date'].dt.weekday)
-
-    # vec = []
-    # for i in range(data.shape[0]):
-    #     print("day:", data['Day'][i])
-    #     print("month: ", data['Month'][i])
-    #     # today = datetime.datetime(data['Date'][i].year(), data['Date'][i].month(), data['Date'][i].day())
-    #     vec.append(today)
-    #
-    #
-    #     # print(today.weekday())
-    # print("this is vec[70]",vec[70])
-    # data['Weekday'] = vec
-    # changes string labels to ints
     c = pd.Categorical(data[TARGET])
     data[TARGET] = c.rename_categories(labels)
 
     # delete duplicates & outliers
     data = data.drop_duplicates()
-    # data = data[(np.abs(stats.zscore(data)) < 3).all(axis=1)]
 
     # normalize
     lst = ['Beat', 'District', 'Ward', 'Community Area']
@@ -122,8 +103,7 @@ if __name__ == '__main__':
 
     data = clean_data(data)
     X_train, y_train = split_x_y(data)
-    # print(y_train['Date'])
-    # print(y_train.value_counts())
+
     print(y_train.value_counts() / y_train.shape[0])
     print(y_train.shape[0])
     # print("THEFT", y_train(1).count())
