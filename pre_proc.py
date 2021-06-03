@@ -59,8 +59,6 @@ def clean_data(data):  # receives X m*d
     data['Block'] = pd.factorize(data["Block"])[0]
 
     data = data.drop('Updated On', axis=1)
-    data['day_of_week'] = data['date2'].dt.day_name()
-    data = pd.get_dummies(data, columns=['day_of_week'])
 
     data = data.drop('Description', axis=1)
     data = data.drop('IUCR', axis=1)
@@ -73,7 +71,8 @@ def clean_data(data):  # receives X m*d
 
     # Splitting the Date to Day, Month, Year, Hour, Minute, Second
     data['date2'] = pd.to_datetime(data['Date'])
-    print(data['date2'])
+    data['day_of_week'] = data['date2'].dt.day_name()
+    data = pd.get_dummies(data, columns=['day_of_week'])
     data['Year'] = data['date2'].dt.year
     data['Month'] = data['date2'].dt.month
     data['Day'] = data['date2'].dt.day
