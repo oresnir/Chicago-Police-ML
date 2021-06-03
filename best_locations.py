@@ -6,6 +6,7 @@ import datetime as dt
 import pre_proc as pp
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
 labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
           'DECEPTIVE PRACTICE': 3, 'ASSAULT': 4}
@@ -13,11 +14,6 @@ labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
 
 def split_x_y(data):
     y = data['Date']
-    # data = data.drop('Date', axis=1)
-    # data = data.drop('Month', axis=1)
-    # data = data.drop('Day', axis=1)
-    # data = data.drop('Hour', axis=1)
-    # data = data.drop('Minute', axis=1)
 
     return data, y
 
@@ -31,8 +27,8 @@ def clean_data(data):  # receives X m*d
     data = data.drop('Unnamed: 0.1', axis=1)
     data = data.drop('ID', axis=1)
     data = data.drop('Year', axis=1)
-    # data['Location'] = pd.factorize(data["Location"])[0]
     data = data.drop('Case Number', axis=1)
+    data = data.drop('Location', axis=1)
     data['Location Description'] = pd.factorize(data["Location Description"])[0]
     data['Block'] = pd.factorize(data["Block"])[0]
     data = data.drop('Updated On', axis=1)
@@ -60,7 +56,7 @@ def clean_data(data):  # receives X m*d
     return data
 
 
-def get_valid_points_per_date(date, y, data):
+def get_valid_points_per_date(date, data):
     time_change = dt.timedelta(minutes=30)
     upper = date + time_change
     data['Date'] = data[data['Date'] <= upper]
@@ -72,6 +68,9 @@ def get_valid_points_per_date(date, y, data):
     return data
 
 
+def get_dist(x, y):
+    return math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+
 
 if __name__ == '__main__':
     data = pd.read_csv("train.csv")
@@ -79,29 +78,34 @@ if __name__ == '__main__':
     X = X.reindex(range(X.shape[0]))
     y = y.reindex(range(X.shape[0]))
 
-    points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), y, X)
+    points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), X)
     print(points)
     # Creating figure
-    fig = plt.figure(figsize=(10, 7))
+    fig = plt.figure(figsize=(20, 13))
     ax = plt.axes(projection="3d")
 
     # Creating plot
-    # dates = matplotlib.dates.date2num(y)
-    ax.scatter3D(X['X Coordinate'], X['Y Coordinate'], y, color="green")
-    plt.title("simple 3D scatter plot")
+    ax.scatter(X['X Coordinate'], X['Y Coordinate'], c=y, cmap='rainbow')
+    plt.gray()
+    # plt.title("simple 3D scatter plot")
 
     # show plot
+    # plt.figure()
+    # plt.scatter3d([get_dist(X['X Coordinate'][i], X['Y Coordinate'][i]) for i in range(X.shape[0])], range(X.shape[0]))
     plt.show()
 
     #
-    # print(X_train)
-    # print()
-    # print(y_train)
-    # kmeans = KMeans(
-    #     init = "random",
-    #     n_clusters = 30,
-    #     n_init = 10,
-    #     max_iter = 300,
-    #     random_state = 42)
-    # kmeans.fit(X_train, y_train)
-    # print(kmeans.score(X_train, y_train))
+    print(X)
+    print()
+    print(y)
+    X = X.drop('Date', axis=1)
+    X = X.dropna()
+    kmeans = KMeans(
+        init="random",
+        n_clusters=30,
+        n_init=10,
+        max_iter=300,
+        random_state=42)
+    kmeans.fit(X)
+    print(kmeans.get_params())
+    print(kmeans.score(X, y))
