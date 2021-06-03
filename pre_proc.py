@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 import scipy.stats as sp
 # from pdpbox.pdp import pdp_isolate, pdp_plot
-import sns as sns
+# import sns as sns
 from sklearn.model_selection import train_test_split
 
 target = 'Primary Type'
@@ -23,6 +23,9 @@ labels = {'BATTERY': 0, 'THEFT': 1,  'CRIMINAL DAMAGE': 2,
 def split_data(data):
     # split to train and test data
     train, validate, test = np.split(data.sample(frac=1), [int(.7 * len(df)), int(.5 * len(df))])
+    train.to_csv("train.csv")
+    validate.to_csv("validate.csv")
+    test.to_csv("test.csv")
     return train, validate, test
 
 
