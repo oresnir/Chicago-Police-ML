@@ -121,13 +121,14 @@ class Cluster:
 
 # day = string(Sunday-Monday) , month = int (1-12)
 def master_clusters(day):
-    hour_centers = np.array(hour_cluster.centers)
-    day_centers = np.array(days_dict[day].centers)
+    hour_centers = pd.DataFrame(hour_cluster.centers)
+    day_centers = pd.DataFrame(days_dict[day].centers)
     frames = [hour_centers, day_centers, day_centers]
     result = pd.concat(frames)
     print(result)
     final_cluster = Cluster(result, 'final')
     final_cluster.create_h()
+    final_cluster.plot_centers()
     return final_cluster.centers
 
 
