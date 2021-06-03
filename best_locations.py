@@ -31,7 +31,7 @@ def clean_data(data):  # receives X m*d
     data = data.drop('Unnamed: 0.1', axis=1)
     data = data.drop('ID', axis=1)
     data = data.drop('Year', axis=1)
-    data['Location'] = pd.factorize(data["Location"])[0]
+    # data['Location'] = pd.factorize(data["Location"])[0]
     data = data.drop('Case Number', axis=1)
     data['Location Description'] = pd.factorize(data["Location Description"])[0]
     data['Block'] = pd.factorize(data["Block"])[0]
@@ -45,25 +45,10 @@ def clean_data(data):  # receives X m*d
     data['Arrest'] = data['Arrest'].astype(int)
     data['Domestic'] = data['Domestic'].astype(int)
 
-    # Splitting the Date to Day, Month, Year, Hour, Minute, Second
     data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
     data = data.dropna()
-    #
-    # data['date2'] = pd.to_datetime(data['Date'])
-    # print(data['date2'])
-    # data['Year'] = data['date2'].dt.year
-    # data['Month'] = data['date2'].dt.month
-    # data['Day'] = data['date2'].dt.day
-    # data['Hour'] = data['date2'].dt.hour
-    # data['Minute'] = data['date2'].dt.minute
-    # # vec = []
-    # for i in range(data.shape[0]):
-    #     vec.append(dt.datetime(data['Year'][i], data['Month'][i], data['Month'][i], data['Hour'][i], data['Minute'][i]))
-    # data['Time'] = vec
-    # data = data.drop(['Date'], axis=1)  # TODO return this
-    data['Date'] = pd.to_datetime(data['Date'])
 
-    # data = data.drop(['date2'], axis=1)
+    data['Date'] = pd.to_datetime(data['Date'])
 
     c = pd.Categorical(data['Primary Type'])
     data['Primary Type'] = c.rename_categories(labels)
@@ -76,15 +61,10 @@ def clean_data(data):  # receives X m*d
 
 
 def get_valid_points_per_date(date, y, data):
-    # for i in range(data.shape[0]):
-    #     data['Date'][i] = dt.datetime(date)
-    # data['Date'] = pd.to_datetime(data['Date'])
     time_change = dt.timedelta(minutes=30)
     upper = date + time_change
     data['Date'] = data[data['Date'] <= upper]
-    # data = data.drop(data[data['Date'] <= upper])
     lower = date - time_change
-    # data = data.drop(data[data['Date'] >= lower])
     data['Date'] = data[data['Date'] >= lower]
     data = data.dropna()
 
