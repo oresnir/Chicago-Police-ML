@@ -198,15 +198,25 @@ def master_clusters(time):
     temp = []
     for i in range(final_cluster.centers.shape[0]):
         temp.append(convert_cat_to_time(final_cluster.centers[i, 2]))
+
+    final= []
+    for i in range(30):
+        tuple1 = (final_cluster.centers[:, 0][i], final_cluster.centers[:, 1][i], np.array(temp)[i])
+        final.append(tuple1)
+    #     final[i][0] = final_cluster.centers[:, 0][i]
+    #     final[i][1] = final_cluster.centers[:, 1][i]
+    #     final[i][2] = np.array(temp)[i]
+    return final
+
     # a = np.delete(final_cluster.centers, final_cluster.centers[:, 2])
-    final = np.array((30, 3))
-    a = final_cluster.centers[:, 0]
-    b = final_cluster.centers[:, 1]
-    l = np.hstack((a,b))
-    ll = np.hstack((l, temp))
+    # a = np.array(final_cluster.centers[:, 0])
+    # print(final_cluster.centers[:, 0])
+    # b = np.array(final_cluster.centers[:, 1])
+    # l = np.vstack((a, b))
+    # ll = np.vstack((l, np.array(temp)))
+    # ll = ll.reshape((30, 3))
     # print(ll)
-    # print("this is the centers:", final_cluster.centers[:, 2].astype(int).unique().size)
-    return ll
+    # return ll
 
 
 def predict(time):
@@ -247,7 +257,7 @@ if __name__ == '__main__':
 
     # print(X['Time Cat'])
     train_hour = X[['X Coordinate', 'Y Coordinate', 'Time Cat']]
-    train_hour['Time Cat'] *= 3 #* train_hour['Time Cat']
+    train_hour['Time Cat'] *= 3  # * train_hour['Time Cat']
     # print(train_hour)
     # train_hour['Time'] = ts
     # train_hour = train_hour.reindex(range(train_hour.shape[0]))
@@ -287,7 +297,6 @@ if __name__ == '__main__':
     #     month_cluster.create_h()
     #     month_cluster.plot_centers()
 
-
     final_dict[0] = master_clusters(dt.datetime(2021, 5, 31, 11, 30, 0))
     final_dict[1] = master_clusters(dt.datetime(2021, 6, 1, 11, 30, 0))
     final_dict[2] = master_clusters(dt.datetime(2021, 6, 2, 11, 30, 0))
@@ -296,3 +305,4 @@ if __name__ == '__main__':
     final_dict[5] = master_clusters(dt.datetime(2021, 6, 5, 11, 30, 0))
     final_dict[6] = master_clusters(dt.datetime(2021, 6, 6, 11, 30, 0))
 
+    print(predict(dt.datetime(2021, 6, 6, 11, 30, 0)))
