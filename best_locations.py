@@ -18,6 +18,7 @@ labels = {'BATTERY': 0, 'THEFT': 1, 'CRIMINAL DAMAGE': 2,
 
 days_dict = {}
 month_dict = {}
+time_dict = {}
 
 
 def split_x_y(data):
@@ -41,16 +42,19 @@ def clean_data(data):  # receives X m*d
     data['Block'] = pd.factorize(data["Block"])[0]
     data = data.drop('Updated On', axis=1)
 
-    data['FBI Code'] = pd.factorize(data['FBI Code'])[0]
-    data['Description'] = pd.factorize(data['Description'])[0]
-    data['IUCR'] = pd.factorize(data['IUCR'])[0]
+    # data['FBI Code'] = pd.factorize(data['FBI Code'])[0]
+    # data['Description'] = pd.factorize(data['Description'])[0]
+    # data['IUCR'] = pd.factorize(data['IUCR'])[0]
+    data = data.drop('Description', axis=1)
+    data = data.drop('IUCR', axis=1)
+    data = data.drop('FBI Code', axis=1)
 
     # changes boll to int
     data['Arrest'] = data['Arrest'].astype(int)
     data['Domestic'] = data['Domestic'].astype(int)
 
-    data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
-    data = data.dropna()
+    # data['Date'] = pd.to_datetime(data['Date'], errors='coerce')
+    # data = data.dropna()
     data['date2'] = pd.to_datetime(data['Date'])
     # print(data['date2'])
     data['Hour'] = data['date2'].dt.hour.astype(int)
@@ -75,19 +79,58 @@ def clean_data(data):  # receives X m*d
     lst = ['Beat', 'District', 'Ward', 'Community Area']
     for i in lst:
         data[i] = data[i] / data[i].abs().max()
+
+    # for i in range(100):
+    #     print(data['Date'][i])
     return data
 
 
-def get_valid_points_per_date(date, data):
+def fill_time_dict(cur):
+    start = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
     time_change = dt.timedelta(minutes=30)
-    upper = date + time_change
-    data['Date'] = data[data['Date'] <= upper]
-    lower = date - time_change
-    data['Date'] = data[data['Date'] >= lower]
-    data = data.dropna()
+    for i in range(48):
+        time_dict[start] = i
+        start = start + time_change
+    return time_dict
 
-    print("returning new filtered data")
-    return data
+
+def get_time_cat(time, cur):
+    time_dict = fill_time_dict(cur)
+    counter = 0
+    new_time = dt.datetime(cur.year, cur.month, cur.day, time.hour, time.minute)
+    temp = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
+    time_change = dt.timedelta(minutes=30)
+    while new_time >= temp and counter < 47:
+        temp = temp + time_change
+        counter += 1
+    return time_dict[temp]
+
+
+def add_time_col(data, cur):
+    lst = [get_time_cat(data['Date'][i], cur) for i, crime in X.iterrows()]
+    data['Time Cat'] = lst
+
+
+# def get_time_category(date, data):
+#     start = dt.time(0, 0)
+#     time_change = dt.timedelta(minutes=30)
+#     upper = start + time_change
+#     data['Date'] = data[data['Date'] <= upper]
+#     lower = start
+#     data['Date'] = data[data['Date'] >= lower]
+#     data = data.dropna()
+
+
+# def get_valid_points_per_date(date, data):
+#     time_change = dt.timedelta(minutes=30)
+#     upper = date + time_change
+#     data['Date'] = data[data['Date'] <= upper]
+#     lower = date - time_change
+#     data['Date'] = data[data['Date'] >= lower]
+#     data = data.dropna()
+#
+#     print("returning new filtered data")
+#     return data
 
 
 def get_dist(x, y):
@@ -160,18 +203,23 @@ if __name__ == '__main__':
     # y = y.reindex(range(X.shape[0]))
     # X['Hour'] = X['Hour'].astype(int)
     # X['Minute'] = X['Minute'].astype(int)
-    train_hour = X[['X Coordinate', 'Y Coordinate']]
     ts = []
 
-    for i in range(X.shape[0]):
-        print(i)
-        h = X['Date'][i].hour
-        m = X['Date'][i].minute
+    print("X size:",X.shape[0])
+    for index, crime in X.iterrows():
+        # data.get('your_column', default=value_if_no_column)
+        h = X['Date'][index].hour
+        m = X['Date'][index].minute
         t = dt.time(h, m)
         ts.append(t)
+    X['Time'] = ts
+    add_time_col(X, dt.datetime(2021, 1, 7, 11, 30, 0))
 
-    train_hour['Time'] = ts
-    train_hour = train_hour.reindex(range(train_hour.shape[0]))
+    # print(X['Time Cat'])
+    train_hour = X[['X Coordinate', 'Y Coordinate', 'Time Cat']]
+    print(train_hour)
+    # train_hour['Time'] = ts
+    # train_hour = train_hour.reindex(range(train_hour.shape[0]))
     hour_cluster = Cluster(train_hour, 'hour')
     hour_cluster.create_h()
     hour_cluster.plot_centers()
