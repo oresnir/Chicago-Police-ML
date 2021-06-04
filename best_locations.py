@@ -85,6 +85,16 @@ def clean_data(data):  # receives X m*d
     return data
 
 
+def convert_cat_to_time(cat):
+    reverse_time_dict = {v: k for k, v in time_dict.items()}
+    cat = cat.astype(int)
+    temp = 0
+    counter = 0
+    while temp < cat and counter < len(reverse_time_dict) - 1:
+        temp += 1
+    return reverse_time_dict[temp]
+
+
 def fill_time_dict(cur):
     start = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
     time_change = dt.timedelta(minutes=30)
@@ -100,7 +110,7 @@ def get_time_cat(time, cur):
     new_time = dt.datetime(cur.year, cur.month, cur.day, time.hour, time.minute)
     temp = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
     time_change = dt.timedelta(minutes=30)
-    while new_time >= temp and counter < 47:
+    while new_time >= temp and counter < len(time_dict) - 1:
         temp = temp + time_change
         counter += 1
     return time_dict[temp]
@@ -163,12 +173,15 @@ class Cluster:
         ax.scatter(self.centers[:, 0], self.centers[:, 1], c=self.centers[:, 2],
                    cmap='rainbow')
         plt.title(f"location vs {self.type}")
+        plt.xlim((min(self.centers[:, 0]), max(self.centers[:, 0])))
+        plt.ylim((min(self.centers[:, 1]), max(self.centers[:, 1])))
+        # plt.clim()
         plt.show()
 
 
 # day = string(Sunday-Monday) , month = int (1-12)
 def master_clusters(time):
-    day =
+    day = time.weekday()
     hour_centers = pd.DataFrame(hour_cluster.centers)
     day_centers = pd.DataFrame(days_dict[day].centers)
     frames = [hour_centers, day_centers, day_centers]
@@ -176,7 +189,12 @@ def master_clusters(time):
     print(result)
     final_cluster = Cluster(result, 'final')
     final_cluster.create_h()
-    final_cluster.plot_centers()
+    # final_cluster.plot_centers()
+    print("this is the cate:", final_cluster.centers[:, 2])
+    for i in range(final_cluster.centers.shape[0]):
+        final_cluster.centers[i][2] = convert_cat_to_time(final_cluster.centers[i][2])
+    print(final_cluster.centers)
+    # print("this is the centers:", final_cluster.centers[:, 2].astype(int).unique().size)
     return final_cluster.centers
 
 
@@ -187,11 +205,6 @@ if __name__ == '__main__':
     X = X.reindex(range(X.shape[0]))
     y = y.reindex(range(X.shape[0]))
     X = X.dropna()
-
-    points = dt.datetime(2021, 1, 7, 11, 30, 0)
-    print(points)
-    points2 = dt.time(11, 30)
-    print(points2)
 
     # points = get_valid_points_per_date(dt.datetime(2021, 1, 7, 11, 30, 0), X)
     # X = X.drop('Date', axis=1)
@@ -206,7 +219,7 @@ if __name__ == '__main__':
     # X['Minute'] = X['Minute'].astype(int)
     ts = []
 
-    print("X size:",X.shape[0])
+    print("X size:", X.shape[0])
     for index, crime in X.iterrows():
         # data.get('your_column', default=value_if_no_column)
         h = X['Date'][index].hour
@@ -243,9 +256,8 @@ if __name__ == '__main__':
         train_day_of_week = train_day_of_week[train_day_of_week['day_of_week'] == value]
         print("the day: ", key, train_day_of_week)
         week_cluster = Cluster(train_day_of_week, key)
-        days_dict[key] = week_cluster
+        days_dict[value] = week_cluster
         week_cluster.create_h()
-        week_cluster.plot_centers()
 
     # for month in range(1, 13):
     #     train_month = X[['X Coordinate', 'Y Coordinate', 'Month']]
@@ -256,4 +268,4 @@ if __name__ == '__main__':
     #     month_cluster.create_h()
     #     month_cluster.plot_centers()
 
-    master_clusters("Monday")
+    master_clusters(dt.datetime(2021, 1, 7, 11, 30, 0))
