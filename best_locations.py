@@ -170,12 +170,11 @@ class Cluster:
     def plot_centers(self):
         plt.figure(figsize=(20, 13))
         ax = plt.axes(projection="3d")
-        ax.scatter(self.centers[:, 0], self.centers[:, 1], c=self.centers[:, 2],
+        ax.scatter(self.centers[:, 0], self.centers[:, 1], self.centers[:, 2],
                    cmap='rainbow')
         plt.title(f"location vs {self.type}")
         plt.xlim((min(self.centers[:, 0]), max(self.centers[:, 0])))
         plt.ylim((min(self.centers[:, 1]), max(self.centers[:, 1])))
-        # plt.clim()
         plt.show()
 
 
