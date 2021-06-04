@@ -305,4 +305,4 @@ if __name__ == '__main__':
     final_dict[5] = master_clusters(dt.datetime(2021, 6, 5, 11, 30, 0))
     final_dict[6] = master_clusters(dt.datetime(2021, 6, 6, 11, 30, 0))
 
-    print(predict(dt.datetime(2021, 6, 6, 11, 30, 0)))
+    # print(predict(dt.datetime(2021, 6, 6, 11, 30, 0)))
