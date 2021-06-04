@@ -20,6 +20,8 @@ days_dict = {}
 month_dict = {}
 time_dict = {}
 
+final_dict = {}
+
 
 def split_x_y(data):
     y = data['Hour']
@@ -207,6 +209,11 @@ def master_clusters(time):
     return ll
 
 
+def predict(time):
+    day = time.weekday()
+    return final_dict[day]
+
+
 if __name__ == '__main__':
     data = pd.read_csv("train.csv")
     data = clean_data(data)
@@ -280,4 +287,12 @@ if __name__ == '__main__':
     #     month_cluster.create_h()
     #     month_cluster.plot_centers()
 
-    # master_clusters(dt.datetime(2022, 1, 7, 11, 30, 0))
+
+    final_dict[0] = master_clusters(dt.datetime(2021, 5, 31, 11, 30, 0))
+    final_dict[1] = master_clusters(dt.datetime(2021, 6, 1, 11, 30, 0))
+    final_dict[2] = master_clusters(dt.datetime(2021, 6, 2, 11, 30, 0))
+    final_dict[3] = master_clusters(dt.datetime(2021, 6, 3, 11, 30, 0))
+    final_dict[4] = master_clusters(dt.datetime(2021, 6, 4, 11, 30, 0))
+    final_dict[5] = master_clusters(dt.datetime(2021, 6, 5, 11, 30, 0))
+    final_dict[6] = master_clusters(dt.datetime(2021, 6, 6, 11, 30, 0))
+
