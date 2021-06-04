@@ -168,7 +168,7 @@ class Cluster:
         k_means.fit(self.df)
         self.h = k_means
         self.centers = k_means.cluster_centers_
-        print("this is", type, self.centers)
+        # print("this is", type, self.centers)
 
     def plot_centers(self):
         plt.figure(figsize=(20, 13))
@@ -188,11 +188,11 @@ def master_clusters(time):
     day_centers = pd.DataFrame(days_dict[day].centers)
     frames = [hour_centers, day_centers]
     result = pd.concat(frames)
-    print(result)
+    # print(result)
     final_cluster = Cluster(result, 'final', 30)
     final_cluster.create_h()
     # final_cluster.plot_centers()
-    print("this is the cate:", final_cluster.centers[:, 2])
+    # print("this is the cate:", final_cluster.centers[:, 2])
     temp = []
     for i in range(final_cluster.centers.shape[0]):
         temp.append(convert_cat_to_time(final_cluster.centers[i, 2]))
@@ -202,7 +202,7 @@ def master_clusters(time):
     b = final_cluster.centers[:, 1]
     l = np.hstack((a,b))
     ll = np.hstack((l, temp))
-    print(ll)
+    # print(ll)
     # print("this is the centers:", final_cluster.centers[:, 2].astype(int).unique().size)
     return ll
 
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     # X['Minute'] = X['Minute'].astype(int)
     ts = []
 
-    print("X size:", X.shape[0])
+    # print("X size:", X.shape[0])
     for index, crime in X.iterrows():
         # data.get('your_column', default=value_if_no_column)
         h = X['Date'][index].hour
@@ -241,12 +241,12 @@ if __name__ == '__main__':
     # print(X['Time Cat'])
     train_hour = X[['X Coordinate', 'Y Coordinate', 'Time Cat']]
     train_hour['Time Cat'] *= 3 #* train_hour['Time Cat']
-    print(train_hour)
+    # print(train_hour)
     # train_hour['Time'] = ts
     # train_hour = train_hour.reindex(range(train_hour.shape[0]))
     hour_cluster = Cluster(train_hour, 'hour', 30)
     hour_cluster.create_h()
-    print("this is hour:", hour_cluster.centers)
+    # print("this is hour:", hour_cluster.centers)
     hour_cluster.plot_centers()
 
     # X['Hour'] = X['Hour'].astype(int)
@@ -266,7 +266,7 @@ if __name__ == '__main__':
         train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week', 'Time Cat']]
         train_day_of_week = train_day_of_week[train_day_of_week['day_of_week'] == value]
         train_day_of_week = train_day_of_week.drop('day_of_week', axis=1)
-        print("the day: ", key, train_day_of_week)
+        # print("the day: ", key, train_day_of_week)
         week_cluster = Cluster(train_day_of_week, key, 30)
         days_dict[value] = week_cluster
         week_cluster.create_h()
@@ -280,4 +280,4 @@ if __name__ == '__main__':
     #     month_cluster.create_h()
     #     month_cluster.plot_centers()
 
-    master_clusters(dt.datetime(2022, 1, 7, 11, 30, 0))
+    # master_clusters(dt.datetime(2022, 1, 7, 11, 30, 0))
