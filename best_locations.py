@@ -167,7 +167,8 @@ class Cluster:
 
 
 # day = string(Sunday-Monday) , month = int (1-12)
-def master_clusters(day):
+def master_clusters(time):
+    day =
     hour_centers = pd.DataFrame(hour_cluster.centers)
     day_centers = pd.DataFrame(days_dict[day].centers)
     frames = [hour_centers, day_centers, day_centers]
