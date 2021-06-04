@@ -87,6 +87,7 @@ def clean_data(data):  # receives X m*d
 
 def convert_cat_to_time(cat):
     reverse_time_dict = {v: k for k, v in time_dict.items()}
+    cat /= 3
     cat = cat.astype(int)
     temp = 0
     counter = 0
@@ -192,11 +193,18 @@ def master_clusters(time):
     final_cluster.create_h()
     # final_cluster.plot_centers()
     print("this is the cate:", final_cluster.centers[:, 2])
+    temp = []
     for i in range(final_cluster.centers.shape[0]):
-        final_cluster.centers[i][2] = convert_cat_to_time(final_cluster.centers[i][2])
-    print(final_cluster.centers)
+        temp.append(convert_cat_to_time(final_cluster.centers[i, 2]))
+    # a = np.delete(final_cluster.centers, final_cluster.centers[:, 2])
+    final = np.array((30, 3))
+    a = final_cluster.centers[:, 0]
+    b = final_cluster.centers[:, 1]
+    l = np.hstack((a,b))
+    ll = np.hstack((l, temp))
+    print(ll)
     # print("this is the centers:", final_cluster.centers[:, 2].astype(int).unique().size)
-    return final_cluster.centers
+    return ll
 
 
 if __name__ == '__main__':
@@ -232,7 +240,7 @@ if __name__ == '__main__':
 
     # print(X['Time Cat'])
     train_hour = X[['X Coordinate', 'Y Coordinate', 'Time Cat']]
-    train_hour['Time Cat'] = 3 * train_hour['Time Cat']
+    train_hour['Time Cat'] *= 3 #* train_hour['Time Cat']
     print(train_hour)
     # train_hour['Time'] = ts
     # train_hour = train_hour.reindex(range(train_hour.shape[0]))
