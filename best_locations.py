@@ -95,17 +95,17 @@ def convert_cat_to_time(cat):
     return reverse_time_dict[temp]
 
 
-def fill_time_dict(cur):
+def fill_time_dict(cur, parts_num):
     start = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
     time_change = dt.timedelta(minutes=30)
-    for i in range(48):
+    for i in range(parts_num):
         time_dict[start] = i
         start = start + time_change
     return time_dict
 
 
-def get_time_cat(time, cur):
-    time_dict = fill_time_dict(cur)
+def get_time_cat(time, cur, parts_num):
+    time_dict = fill_time_dict(cur, parts_num)
     counter = 0
     new_time = dt.datetime(cur.year, cur.month, cur.day, time.hour, time.minute)
     temp = dt.datetime(cur.year, cur.month, cur.day, 0, 0)
@@ -116,8 +116,8 @@ def get_time_cat(time, cur):
     return time_dict[temp]
 
 
-def add_time_col(data, cur):
-    lst = [get_time_cat(data['Date'][i], cur) for i, crime in X.iterrows()]
+def add_time_col(data, cur, parts_num):
+    lst = [get_time_cat(data['Date'][i], cur, parts_num) for i, crime in X.iterrows()]
     data['Time Cat'] = lst
 
 
@@ -149,23 +149,25 @@ def get_dist(x, y):
 
 class Cluster:
 
-    def __init__(self, df, type):
+    def __init__(self, df, type, n_clusters):
         self.h = None
         self.df = df
         self.centers = None
         self.type = type
+        self.n_clusters = n_clusters
 
     def create_h(self):
         k_means = KMeans(
             init="random",
-            n_clusters=30,
+            n_clusters=self.n_clusters,
             n_init=10,
-            max_iter=300,
+            max_iter=100,
             random_state=42)
 
         k_means.fit(self.df)
         self.h = k_means
         self.centers = k_means.cluster_centers_
+        print("this is", type, self.centers)
 
     def plot_centers(self):
         plt.figure(figsize=(20, 13))
@@ -183,10 +185,10 @@ def master_clusters(time):
     day = time.weekday()
     hour_centers = pd.DataFrame(hour_cluster.centers)
     day_centers = pd.DataFrame(days_dict[day].centers)
-    frames = [hour_centers, day_centers, day_centers]
+    frames = [hour_centers, day_centers]
     result = pd.concat(frames)
     print(result)
-    final_cluster = Cluster(result, 'final')
+    final_cluster = Cluster(result, 'final', 30)
     final_cluster.create_h()
     # final_cluster.plot_centers()
     print("this is the cate:", final_cluster.centers[:, 2])
@@ -226,15 +228,17 @@ if __name__ == '__main__':
         t = dt.time(h, m)
         ts.append(t)
     X['Time'] = ts
-    add_time_col(X, dt.datetime(2021, 1, 7, 11, 30, 0))
+    add_time_col(X, dt.datetime(2021, 3, 7, 11, 30, 0), 48)
 
     # print(X['Time Cat'])
     train_hour = X[['X Coordinate', 'Y Coordinate', 'Time Cat']]
+    train_hour['Time Cat'] = 3 * train_hour['Time Cat']
     print(train_hour)
     # train_hour['Time'] = ts
     # train_hour = train_hour.reindex(range(train_hour.shape[0]))
-    hour_cluster = Cluster(train_hour, 'hour')
+    hour_cluster = Cluster(train_hour, 'hour', 30)
     hour_cluster.create_h()
+    print("this is hour:", hour_cluster.centers)
     hour_cluster.plot_centers()
 
     # X['Hour'] = X['Hour'].astype(int)
@@ -251,10 +255,11 @@ if __name__ == '__main__':
     # hour_cluster.plot_centers()
 
     for key, value in week_days.items():
-        train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week']]
+        train_day_of_week = X[['X Coordinate', 'Y Coordinate', 'day_of_week', 'Time Cat']]
         train_day_of_week = train_day_of_week[train_day_of_week['day_of_week'] == value]
+        train_day_of_week = train_day_of_week.drop('day_of_week', axis=1)
         print("the day: ", key, train_day_of_week)
-        week_cluster = Cluster(train_day_of_week, key)
+        week_cluster = Cluster(train_day_of_week, key, 30)
         days_dict[value] = week_cluster
         week_cluster.create_h()
 
@@ -267,4 +272,4 @@ if __name__ == '__main__':
     #     month_cluster.create_h()
     #     month_cluster.plot_centers()
 
-    master_clusters(dt.datetime(2021, 1, 7, 11, 30, 0))
+    master_clusters(dt.datetime(2022, 1, 7, 11, 30, 0))
